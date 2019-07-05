@@ -212,6 +212,6 @@ mod tests {
             Some(vec![2]),
             None,
         ];
-        b.iter(|| classify_as_vec(input.clone(), |curo| curo.is_some()));
+        b.iter(|| classify_as_vec(input.iter(), |curo| curo.is_some()));
     }
 }
