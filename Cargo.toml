@@ -9,3 +9,10 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/zserik/sharpen"
 
 [dependencies]
+
+[dev-dependencies]
+criterion = "0.2.11"
+
+[[bench]]
+name = "classify"
+harness = false

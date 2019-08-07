@@ -43,10 +43,8 @@ where
             last.push(x);
         }
         let fnx = &mut self.fnx;
-        for (new_ccl, x) in self.inner.map(|x| {
-            let fnr = fnx(&x);
-            (fnr, x)
-        }) {
+        for x in &mut self.inner {
+            let new_ccl = fnx(&x);
             if new_ccl != ccl {
                 if last.is_empty() {
                     ccl = new_ccl;
@@ -208,18 +206,5 @@ mod tests {
                 (false, vec![None]),
             ]
         );
-    }
-
-    #[bench]
-    fn bench_clsfit2(b: &mut test::Bencher) {
-        let input: Vec<Option<Vec<u8>>> = vec![
-            Some(vec![0, 0, 1]),
-            Some(vec![0, 1]),
-            None,
-            None,
-            Some(vec![2]),
-            None,
-        ];
-        b.iter(|| classify_as_vec(input.iter(), |curo| curo.is_some()));
     }
 }
