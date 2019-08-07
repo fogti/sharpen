@@ -27,7 +27,7 @@ where
     }
 }
 
-impl<'a, TT: 'a, TC, FnT, IT> Iterator for ClassifyIT<'a, TT, TC, FnT, IT>
+impl<TT, TC, FnT, IT> Iterator for ClassifyIT<'_, TT, TC, FnT, IT>
 where
     TC: Copy + Default + PartialEq,
     FnT: FnMut(&TT) -> TC,
@@ -70,6 +70,14 @@ where
     }
 }
 
+impl<TT, TC, FnT, IT> core::iter::FusedIterator for ClassifyIT<'_, TT, TC, FnT, IT>
+where
+    TC: Copy + Default + PartialEq,
+    FnT: FnMut(&TT) -> TC,
+    IT: Iterator<Item = TT>,
+{
+}
+
 pub trait Classify<'a, TT: 'a>
 where
     Self: Sized + Iterator<Item = TT> + 'a,
@@ -93,7 +101,7 @@ where
     }
 }
 
-pub fn classify<'a, Input, FnT, TT: 'a, TC, TRes>(input: Input, fnx: FnT) -> TRes
+pub fn classify<Input, FnT, TT, TC, TRes>(input: Input, fnx: FnT) -> TRes
 where
     Input: IntoIterator<Item = TT>,
     FnT: FnMut(&TT) -> TC,
@@ -103,7 +111,7 @@ where
     input.into_iter().classify(fnx).collect()
 }
 
-pub fn classify_as_vec<'a, Input, FnT, TT: 'a, TC>(input: Input, fnx: FnT) -> Vec<(TC, Vec<TT>)>
+pub fn classify_as_vec<Input, FnT, TT, TC>(input: Input, fnx: FnT) -> Vec<(TC, Vec<TT>)>
 where
     Input: IntoIterator<Item = TT>,
     FnT: FnMut(&TT) -> TC,

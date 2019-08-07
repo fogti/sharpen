@@ -1,5 +1,7 @@
 # sharpen
 
+[![crates.io](https://img.shields.io/crates/v/sharpen.svg)](https://crates.io/crates/sharpen)
+
 A rust library for iterator element condensing and sharpening.
 
 ## License
