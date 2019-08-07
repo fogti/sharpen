@@ -1,6 +1,6 @@
 [package]
 name = "sharpen"
-version = "0.0.2"
+version = "0.0.3"
 description = "A rust library for iterator element condensing and sharpening."
 authors = ["Erik Zscheile <erik.zscheile@gmail.com>"]
 categories = ["algorithms", "no-std"]
