@@ -66,6 +66,13 @@ where
             Some((ccl, last))
         }
     }
+
+    /// This iterator probably produces lesser values than the inner iterator
+    /// but it is still possible, that every element yields a different ccl,
+    /// thus producing the same element count as the inner iterator
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        self.inner.size_hint()
+    }
 }
 
 impl<TT, TC, FnT, IT> core::iter::FusedIterator for ClassifyIT<'_, TT, TC, FnT, IT>
@@ -128,7 +135,7 @@ mod tests {
         let res: Vec<_> = classify(input, |&curc| curc);
         assert_eq!(
             res,
-            vec![
+            &[
                 (0, vec![0, 0]),
                 (1, vec![1, 1]),
                 (2, vec![2, 2]),
@@ -154,7 +161,7 @@ mod tests {
         let res: Vec<_> = classify(input, |curo| curo.is_some());
         assert_eq!(
             res,
-            vec![
+            &[
                 (true, vec![Some(0), Some(1), Some(5), Some(5)]),
                 (false, vec![None, None]),
                 (true, vec![Some(0)]),
@@ -176,7 +183,7 @@ mod tests {
         let res: Vec<_> = classify(input, |curo| curo.is_some());
         assert_eq!(
             res,
-            vec![
+            &[
                 (true, vec![Some(vec![0, 0, 1]), Some(vec![0, 1])]),
                 (false, vec![None, None]),
                 (true, vec![Some(vec![2])]),
@@ -199,7 +206,7 @@ mod tests {
             ClassifyIT::new(&mut input.into_iter(), |curo| curo.is_some()).collect::<Vec<_>>();
         assert_eq!(
             res,
-            vec![
+            &[
                 (true, vec![Some(vec![0, 0, 1]), Some(vec![0, 1])]),
                 (false, vec![None, None]),
                 (true, vec![Some(vec![2])]),

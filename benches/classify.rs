@@ -5,12 +5,12 @@ use criterion::{Criterion};
 use sharpen::*;
 
 fn criterion_benchmark(c: &mut Criterion) {
-    let input: Vec<Option<Vec<u8>>> = vec![
-        Some(vec![0, 0, 1]),
-        Some(vec![0, 1]),
+    let input: &[Option<&[u8]>] = &[
+        Some(&[0, 0, 1]),
+        Some(&[0, 1]),
         None,
         None,
-        Some(vec![2]),
+        Some(&[2]),
         None,
     ];
     c.bench_function("classify 6-4", move |b| b.iter(|| classify_as_vec(input.iter(), |curo| curo.is_some())));
