@@ -5,7 +5,7 @@ pub struct ClassifyIT<'a, TT: 'a, TC, FnT, IT>
 where
     TC: Copy + Default + PartialEq,
     FnT: FnMut(&TT) -> TC,
-    IT: Iterator<Item = TT>,
+    IT: ?Sized + Iterator<Item = TT>,
 {
     inner: &'a mut IT,
     fnx: FnT,
@@ -85,7 +85,7 @@ where
 
 pub trait Classify<'a, TT: 'a>
 where
-    Self: Sized + Iterator<Item = TT> + 'a,
+    Self: Iterator<Item = TT> + 'a,
 {
     fn classify<TC, FnT>(&'a mut self, fnx: FnT) -> ClassifyIT<'a, TT, TC, FnT, Self>
     where
@@ -95,7 +95,7 @@ where
 
 impl<'a, IT, TT: 'a> Classify<'a, TT> for IT
 where
-    Self: Sized + Iterator<Item = TT> + 'a,
+    Self: Iterator<Item = TT> + 'a,
 {
     fn classify<TC, FnT>(&'a mut self, fnx: FnT) -> ClassifyIT<'a, TT, TC, FnT, Self>
     where
