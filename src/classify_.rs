@@ -1,9 +1,17 @@
 use alloc::vec::Vec;
 
-#[derive(Eq, PartialEq)]
+pub trait Classification
+where
+    Self: Copy + Default + PartialEq,
+{
+}
+
+impl<TC> Classification for TC where TC: Copy + Default + PartialEq {}
+
+#[derive(Debug, Eq, Hash, PartialEq)]
 pub struct ClassifyIT<'a, TT: 'a, TC, FnT, IT>
 where
-    TC: Copy + Default + PartialEq,
+    TC: Classification,
     FnT: FnMut(&TT) -> TC,
     IT: ?Sized + Iterator<Item = TT>,
 {
@@ -14,7 +22,7 @@ where
 
 impl<'a, TT: 'a, TC, FnT, IT> ClassifyIT<'a, TT, TC, FnT, IT>
 where
-    TC: Copy + Default + PartialEq,
+    TC: Classification,
     FnT: FnMut(&TT) -> TC,
     IT: Iterator<Item = TT>,
 {
@@ -29,7 +37,7 @@ where
 
 impl<TT, TC, FnT, IT> Iterator for ClassifyIT<'_, TT, TC, FnT, IT>
 where
-    TC: Copy + Default + PartialEq,
+    TC: Classification,
     FnT: FnMut(&TT) -> TC,
     IT: Iterator<Item = TT>,
 {
@@ -77,7 +85,7 @@ where
 
 impl<TT, TC, FnT, IT> core::iter::FusedIterator for ClassifyIT<'_, TT, TC, FnT, IT>
 where
-    TC: Copy + Default + PartialEq,
+    TC: Classification,
     FnT: FnMut(&TT) -> TC,
     IT: Iterator<Item = TT>,
 {
@@ -89,7 +97,7 @@ where
 {
     fn classify<TC, FnT>(&'a mut self, fnx: FnT) -> ClassifyIT<'a, TT, TC, FnT, Self>
     where
-        TC: Copy + Default + PartialEq,
+        TC: Classification,
         FnT: FnMut(&TT) -> TC;
 }
 
@@ -99,7 +107,7 @@ where
 {
     fn classify<TC, FnT>(&'a mut self, fnx: FnT) -> ClassifyIT<'a, TT, TC, FnT, Self>
     where
-        TC: Copy + Default + PartialEq,
+        TC: Classification,
         FnT: FnMut(&TT) -> TC,
     {
         ClassifyIT::new(self, fnx)
@@ -110,7 +118,7 @@ pub fn classify<Input, FnT, TT, TC, TRes>(input: Input, fnx: FnT) -> TRes
 where
     Input: IntoIterator<Item = TT>,
     FnT: FnMut(&TT) -> TC,
-    TC: Copy + Default + PartialEq,
+    TC: Classification,
     TRes: core::iter::FromIterator<(TC, Vec<TT>)>,
 {
     input.into_iter().classify(fnx).collect()
@@ -120,7 +128,7 @@ pub fn classify_as_vec<Input, FnT, TT, TC>(input: Input, fnx: FnT) -> Vec<(TC, V
 where
     Input: IntoIterator<Item = TT>,
     FnT: FnMut(&TT) -> TC,
-    TC: Copy + Default + PartialEq,
+    TC: Classification,
 {
     classify(input, fnx)
 }
