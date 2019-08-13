@@ -5,6 +5,7 @@ pub trait Classification: Copy + Default + PartialEq {}
 impl<TC> Classification for TC where TC: Copy + Default + PartialEq {}
 
 #[derive(Debug, Eq, Hash, PartialEq)]
+#[must_use]
 pub struct ClassifyIT<'a, TT: 'a, TC, FnT, IT>
 where
     TC: Classification,
