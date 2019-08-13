@@ -26,7 +26,7 @@ where
         Self {
             inner,
             fnx,
-            edge: (Some(Default::default()), None),
+            edge: (Some(<_>::default()), None),
         }
     }
 }
@@ -40,13 +40,14 @@ where
     type Item = (TC, Vec<TT>);
 
     fn next(&mut self) -> Option<Self::Item> {
-        let mut ccl = self.edge.0?;
-        let mut last = Vec::<TT>::new();
-
-        if let Some(x) = self.edge.1.take() {
-            last.push(x);
-        }
+        let mut ccl = self.edge.0.take()?;
         let fnx = &mut self.fnx;
+        let mut last = if let Some(x) = self.edge.1.take() {
+            vec![x]
+        } else {
+            vec![]
+        };
+
         for x in &mut self.inner {
             let old_ccl = ccl;
             ccl = fnx(&x);
@@ -59,7 +60,6 @@ where
         }
 
         // we reached the end of the inner iterator
-        self.edge = (None, None);
         if last.is_empty() {
             None
         } else {
@@ -70,6 +70,7 @@ where
     /// This iterator probably produces lesser values than the inner iterator
     /// but it is still possible, that every element yields a different ccl,
     /// thus producing the same element count as the inner iterator
+    #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.inner.size_hint()
     }
@@ -94,6 +95,7 @@ impl<'a, IT, TT: 'a> Classify<'a, TT> for IT
 where
     IT: Iterator<Item = TT> + 'a,
 {
+    #[inline]
     fn classify<TC, FnT>(&'a mut self, fnx: FnT) -> ClassifyIT<'a, TT, TC, FnT, Self>
     where
         TC: Classification,
@@ -103,20 +105,20 @@ where
     }
 }
 
-pub fn classify<Input, FnT, TT, TC, TRes>(input: Input, fnx: FnT) -> TRes
+#[inline]
+pub fn classify<Input, TT, TC, TRes>(input: Input, fnx: impl FnMut(&TT) -> TC) -> TRes
 where
     Input: IntoIterator<Item = TT>,
-    FnT: FnMut(&TT) -> TC,
     TC: Classification,
     TRes: core::iter::FromIterator<(TC, Vec<TT>)>,
 {
     input.into_iter().classify(fnx).collect()
 }
 
-pub fn classify_as_vec<Input, FnT, TT, TC>(input: Input, fnx: FnT) -> Vec<(TC, Vec<TT>)>
+#[inline]
+pub fn classify_as_vec<Input, TT, TC>(input: Input, fnx: impl FnMut(&TT) -> TC) -> Vec<(TC, Vec<TT>)>
 where
     Input: IntoIterator<Item = TT>,
-    FnT: FnMut(&TT) -> TC,
     TC: Classification,
 {
     classify(input, fnx)
