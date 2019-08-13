@@ -48,15 +48,13 @@ where
         }
         let fnx = &mut self.fnx;
         for x in &mut self.inner {
-            let new_ccl = fnx(&x);
-            if new_ccl == ccl {
-                last.push(x);
-            } else if last.is_empty() {
-                ccl = new_ccl;
+            let old_ccl = ccl;
+            ccl = fnx(&x);
+            if ccl == old_ccl || last.is_empty() {
                 last.push(x);
             } else {
-                self.edge = (Some(new_ccl), Some(x));
-                return Some((ccl, last));
+                self.edge = (Some(ccl), Some(x));
+                return Some((old_ccl, last));
             }
         }
 
