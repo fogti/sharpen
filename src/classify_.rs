@@ -1,10 +1,6 @@
 use alloc::vec::Vec;
 
-pub trait Classification
-where
-    Self: Copy + Default + PartialEq,
-{
-}
+pub trait Classification: Copy + Default + PartialEq {}
 
 impl<TC> Classification for TC where TC: Copy + Default + PartialEq {}
 
@@ -53,16 +49,14 @@ where
         let fnx = &mut self.fnx;
         for x in &mut self.inner {
             let new_ccl = fnx(&x);
-            if new_ccl != ccl {
-                if last.is_empty() {
-                    ccl = new_ccl;
-                    last.push(x);
-                } else {
-                    self.edge = (Some(new_ccl), Some(x));
-                    return Some((ccl, last));
-                }
-            } else {
+            if new_ccl == ccl {
                 last.push(x);
+            } else if last.is_empty() {
+                ccl = new_ccl;
+                last.push(x);
+            } else {
+                self.edge = (Some(new_ccl), Some(x));
+                return Some((ccl, last));
             }
         }
 
@@ -91,10 +85,7 @@ where
 {
 }
 
-pub trait Classify<'a, TT: 'a>
-where
-    Self: Iterator<Item = TT> + 'a,
-{
+pub trait Classify<'a, TT: 'a>: Iterator<Item = TT> + 'a {
     fn classify<TC, FnT>(&'a mut self, fnx: FnT) -> ClassifyIT<'a, TT, TC, FnT, Self>
     where
         TC: Classification,
@@ -103,7 +94,7 @@ where
 
 impl<'a, IT, TT: 'a> Classify<'a, TT> for IT
 where
-    Self: Iterator<Item = TT> + 'a,
+    IT: Iterator<Item = TT> + 'a,
 {
     fn classify<TC, FnT>(&'a mut self, fnx: FnT) -> ClassifyIT<'a, TT, TC, FnT, Self>
     where
