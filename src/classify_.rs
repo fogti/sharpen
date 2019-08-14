@@ -68,6 +68,39 @@ where
         }
     }
 
+    fn fold<Acc, Fold>(mut self, init: Acc, mut f: Fold) -> Acc
+    where
+        Fold: FnMut(Acc, Self::Item) -> Acc,
+    {
+        let mut ccl = match self.edge.0.take() {
+            Some(ccl) => ccl,
+            None => return init,
+        };
+        let mut accum = init;
+        let fnx = &mut self.fnx;
+        let mut last = if let Some(x) = self.edge.1.take() {
+            vec![x]
+        } else {
+            vec![]
+        };
+
+        for x in &mut self.inner {
+            let old_ccl = ccl;
+            ccl = fnx(&x);
+            if ccl == old_ccl || last.is_empty() {
+                last.push(x);
+            } else {
+                accum = f(accum, (old_ccl, core::mem::replace(&mut last, vec![x])));
+            }
+        }
+
+        // we reached the end of the inner iterator
+        if !last.is_empty() {
+            accum = f(accum, (ccl, last));
+        }
+        accum
+    }
+
     /// This iterator probably produces lesser values than the inner iterator
     /// but it is still possible, that every element yields a different ccl,
     /// thus producing the same element count as the inner iterator
@@ -212,6 +245,32 @@ mod tests {
                 (true, vec![Some(vec![2])]),
                 (false, vec![None]),
             ]
+        );
+    }
+
+    #[test]
+    fn test_clsfold0() {
+        let input: Vec<Option<Vec<u8>>> = vec![
+            Some(vec![0, 0, 1]),
+            Some(vec![0, 1]),
+            None,
+            None,
+            Some(vec![2]),
+            None,
+        ];
+        let input2 = input.clone();
+        let fon_curo = |curo: &Option<Vec<u8>>| curo.is_some();
+        fn f_apply_fold(x: impl Iterator<Item = (bool, Vec<Option<Vec<u8>>>)>) -> usize {
+            x.fold(0, |acc, i| acc + i.1.into_iter().fold(0, |acc2, i2| acc2 + i2.unwrap_or(vec![]).len()))
+        }
+        let f_inner_res = f_apply_fold(ClassifyIT::new(&mut input.into_iter(), fon_curo));
+        assert_eq!(
+            f_inner_res,
+            6,
+        );
+        assert_eq!(
+            f_inner_res,
+            f_apply_fold(ClassifyIT::new(&mut input2.into_iter(), fon_curo).collect::<Vec<_>>().into_iter()),
         );
     }
 }
