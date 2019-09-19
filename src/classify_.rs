@@ -1,4 +1,4 @@
-use alloc::vec::Vec;
+use alloc::{vec, vec::Vec};
 
 pub trait Classification: Copy + Default + PartialEq {}
 
@@ -117,7 +117,10 @@ where
 }
 
 #[inline]
-pub fn classify_as_vec<Input, TT, TC>(input: Input, fnx: impl FnMut(&TT) -> TC) -> Vec<(TC, Vec<TT>)>
+pub fn classify_as_vec<Input, TT, TC>(
+    input: Input,
+    fnx: impl FnMut(&TT) -> TC,
+) -> Vec<(TC, Vec<TT>)>
 where
     Input: IntoIterator<Item = TT>,
     TC: Classification,
