@@ -23,6 +23,7 @@ where
     FnT: FnMut(&TT) -> TC,
     IT: Iterator<Item = TT>,
 {
+    #[inline]
     pub fn new(inner: &'a mut IT, fnx: FnT) -> Self {
         Self {
             inner,
