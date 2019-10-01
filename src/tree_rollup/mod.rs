@@ -8,8 +8,9 @@ Roll up a tree given as a flat structure and a mapping {from child to parent}
 into a hierarchical structure.
 
 Invariants for the arguments:
+* Any parent must come before it's children inside `input`.
 * The largest index in `mapping` should be inside of the bounds of `input`.
-* This means that any parent must come before it's children inside `input`.
+* `mapping` keys (child) must be greater than the associated value (parent)
 
 Return value:
 * None: Detected duplicated usage of id's (probably the `mapping` was invalid).
@@ -34,16 +35,12 @@ pub trait Node {
     fn reverse(&mut self);
 }
 
-/// Mapping from child to parent; invariant: key > value
 type Mapping = BTreeMap<usize, usize>;
 
-fn rollup_tree_intern<T>(
+fn rollup_tree_intern<T: Node>(
     mut v: Vec<Option<T>>,
     mapping: &Mapping,
-) -> Option<impl Iterator<Item = T>>
-where
-    T: Node,
-{
+) -> Option<impl Iterator<Item = T>> {
     for (child_id, parent_id) in mapping.iter().rev() {
         let mut child: T = core::mem::replace(v.get_mut(*child_id)?, None)?;
         child.reverse();
