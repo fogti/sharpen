@@ -3,10 +3,6 @@ use alloc::{vec, vec::Vec};
 #[cfg(test)]
 mod tests;
 
-pub trait Classification: Default + PartialEq {}
-
-impl<TC> Classification for TC where TC: Default + PartialEq {}
-
 #[derive(Debug, Eq, PartialEq)]
 #[must_use]
 pub struct ClassifyIT<'a, TT: 'a, TC, FnT, IT: ?Sized> {
@@ -82,7 +78,7 @@ where
 pub trait Classify<'a, TT: 'a>: Iterator<Item = TT> + 'a {
     fn classify<TC, FnT>(&'a mut self, fnx: FnT) -> ClassifyIT<'a, TT, TC, FnT, Self>
     where
-        TC: Classification,
+        TC: Default + PartialEq,
         FnT: FnMut(&TT) -> TC;
 }
 
@@ -93,7 +89,7 @@ where
     #[inline]
     fn classify<TC, FnT>(&'a mut self, fnx: FnT) -> ClassifyIT<'a, TT, TC, FnT, Self>
     where
-        TC: Classification,
+        TC: Default + PartialEq,
         FnT: FnMut(&TT) -> TC,
     {
         ClassifyIT::new(self, fnx)
@@ -104,7 +100,7 @@ where
 pub fn classify<Input, TT, TC, TRes>(input: Input, fnx: impl FnMut(&TT) -> TC) -> TRes
 where
     Input: IntoIterator<Item = TT>,
-    TC: Classification,
+    TC: Default + PartialEq,
     TRes: core::iter::FromIterator<(TC, Vec<TT>)>,
 {
     input.into_iter().classify(fnx).collect()
@@ -117,7 +113,7 @@ pub fn classify_as_vec<Input, TT, TC>(
 ) -> Vec<(TC, Vec<TT>)>
 where
     Input: IntoIterator<Item = TT>,
-    TC: Classification,
+    TC: Default + PartialEq,
 {
     classify(input, fnx)
 }
