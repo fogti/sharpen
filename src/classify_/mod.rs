@@ -3,18 +3,13 @@ use alloc::{vec, vec::Vec};
 #[cfg(test)]
 mod tests;
 
-pub trait Classification: Copy + Default + PartialEq {}
+pub trait Classification: Default + PartialEq {}
 
-impl<TC> Classification for TC where TC: Copy + Default + PartialEq {}
+impl<TC> Classification for TC where TC: Default + PartialEq {}
 
-#[derive(Debug, Eq, Hash, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 #[must_use]
-pub struct ClassifyIT<'a, TT: 'a, TC, FnT, IT>
-where
-    TC: Classification,
-    FnT: FnMut(&TT) -> TC,
-    IT: ?Sized + Iterator<Item = TT>,
-{
+pub struct ClassifyIT<'a, TT: 'a, TC, FnT, IT: ?Sized> {
     inner: &'a mut IT,
     fnx: FnT,
     edge: (Option<TC>, Option<TT>),
@@ -22,7 +17,7 @@ where
 
 impl<'a, TT: 'a, TC, FnT, IT> ClassifyIT<'a, TT, TC, FnT, IT>
 where
-    TC: Classification,
+    TC: Default,
     FnT: FnMut(&TT) -> TC,
     IT: Iterator<Item = TT>,
 {
@@ -38,7 +33,7 @@ where
 
 impl<TT, TC, FnT, IT> Iterator for ClassifyIT<'_, TT, TC, FnT, IT>
 where
-    TC: Classification,
+    TC: PartialEq,
     FnT: FnMut(&TT) -> TC,
     IT: Iterator<Item = TT>,
 {
@@ -47,15 +42,10 @@ where
     fn next(&mut self) -> Option<Self::Item> {
         let mut ccl = self.edge.0.take()?;
         let fnx = &mut self.fnx;
-        let mut last = if let Some(x) = self.edge.1.take() {
-            vec![x]
-        } else {
-            vec![]
-        };
+        let mut last = self.edge.1.take().map_or_else(Vec::new, |x| vec![x]);
 
         for x in &mut self.inner {
-            let old_ccl = ccl;
-            ccl = fnx(&x);
+            let old_ccl = core::mem::replace(&mut ccl, fnx(&x));
             if ccl == old_ccl || last.is_empty() {
                 last.push(x);
             } else {
@@ -83,7 +73,7 @@ where
 
 impl<TT, TC, FnT, IT> core::iter::FusedIterator for ClassifyIT<'_, TT, TC, FnT, IT>
 where
-    TC: Classification,
+    TC: PartialEq,
     FnT: FnMut(&TT) -> TC,
     IT: Iterator<Item = TT>,
 {
