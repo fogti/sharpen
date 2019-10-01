@@ -21,7 +21,7 @@ where
     T: Node,
     I: IntoIterator<Item = T>,
 {
-    rollup_tree_intern(input.into_iter().map(|i| Some(i)).collect(), mapping)
+    rollup_tree_intern(input.into_iter().map(Some).collect(), mapping)
 }
 
 pub trait Node {
