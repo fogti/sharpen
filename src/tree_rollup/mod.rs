@@ -45,7 +45,6 @@ where
     T: Node,
 {
     for (child_id, parent_id) in mapping.iter().rev() {
-        // use `steal` prevent overlapping access
         let mut child: T = core::mem::replace(v.get_mut(*child_id)?, None)?;
         child.reverse();
         Node::push_child(v.get_mut(*parent_id)?.as_mut()?, child);
