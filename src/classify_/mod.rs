@@ -37,11 +37,10 @@ where
 
     fn next(&mut self) -> Option<Self::Item> {
         let mut ccl = self.edge.0.take()?;
-        let fnx = &mut self.fnx;
         let mut last = self.edge.1.take().map_or_else(Vec::new, |x| vec![x]);
 
         for x in &mut self.inner {
-            let old_ccl = core::mem::replace(&mut ccl, fnx(&x));
+            let old_ccl = core::mem::replace(&mut ccl, (self.fnx)(&x));
             if ccl == old_ccl || last.is_empty() {
                 last.push(x);
             } else {
