@@ -1,6 +1,6 @@
 [package]
 name = "sharpen"
-version = "0.0.4"
+version = "0.0.5"
 description = "A rust library for iterator element condensing and sharpening."
 authors = ["Erik Zscheile <erik.zscheile@gmail.com>"]
 categories = ["algorithms", "no-std"]
@@ -15,4 +15,8 @@ criterion = "0.2.11"
 
 [[bench]]
 name = "classify"
+harness = false
+
+[[bench]]
+name = "tree_rollup"
 harness = false
