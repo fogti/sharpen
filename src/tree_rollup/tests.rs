@@ -1,5 +1,5 @@
 use super::*;
-use alloc::{collections::BTreeMap, vec};
+use alloc::{collections::BTreeMap, vec, vec::Vec};
 
 #[derive(Debug, PartialEq, Eq)]
 struct Element(usize);
@@ -23,5 +23,111 @@ fn test_rollup_tree() {
     let result: Vec<_> = rollup_tree(input.into_iter(), mapping)
         .expect("valid mapping")
         .collect();
-    assert_eq!(result, vec![Element(5), Element(5),]);
+    assert_eq!(result, vec![Element(5), Element(5)]);
+}
+
+#[derive(Debug, PartialEq, Eq)]
+struct CplxElement {
+    data: usize,
+    children: Vec<CplxElement>,
+}
+
+impl CplxElement {
+    fn new(data: usize) -> Self {
+        Self {
+            data,
+            children: vec![],
+        }
+    }
+}
+
+impl Node for CplxElement {
+    fn push_child(&mut self, child: Self) {
+        self.children.push(child);
+    }
+    fn reverse(&mut self) {
+        self.children.reverse();
+    }
+}
+
+#[test]
+fn test_rollup_complex_tree() {
+    let input = vec![
+        CplxElement::new(0),
+        CplxElement::new(1),
+        CplxElement::new(2),
+        CplxElement::new(3),
+        CplxElement::new(4),
+        CplxElement::new(5),
+        CplxElement::new(6),
+        CplxElement::new(7),
+        CplxElement::new(8),
+    ];
+    let mapping = vec![(1, 0), (2, 0), (4, 3), (5, 3), (6, 4), (7, 3)];
+
+    let result: Vec<_> = rollup_tree(input.into_iter(), mapping)
+        .expect("invalid mapping")
+        .collect();
+    assert_eq!(
+        result,
+        vec![
+            CplxElement {
+                data: 0,
+                children: vec![CplxElement::new(1), CplxElement::new(2)],
+            },
+            CplxElement {
+                data: 3,
+                children: vec![
+                    CplxElement {
+                        data: 4,
+                        children: vec![CplxElement::new(6)],
+                    },
+                    CplxElement::new(5),
+                    CplxElement::new(7),
+                ],
+            },
+            CplxElement::new(8),
+        ]
+    );
+}
+
+#[test]
+fn test_rollup_bottomup_complex_tree() {
+    let input = vec![
+        CplxElement::new(0),
+        CplxElement::new(1),
+        CplxElement::new(2),
+        CplxElement::new(3),
+        CplxElement::new(4),
+        CplxElement::new(5),
+        CplxElement::new(6),
+        CplxElement::new(7),
+        CplxElement::new(8),
+    ];
+    let mapping = vec![(0, 2), (1, 2), (3, 5), (4, 5), (5, 7), (6, 7)];
+
+    let result: Vec<_> = rollup_tree_bottomup(input.into_iter(), mapping)
+        .expect("invalid mapping")
+        .collect();
+
+    assert_eq!(
+        result,
+        vec![
+            CplxElement {
+                data: 2,
+                children: vec![CplxElement::new(0), CplxElement::new(1)]
+            },
+            CplxElement {
+                data: 7,
+                children: vec![
+                    CplxElement {
+                        data: 5,
+                        children: vec![CplxElement::new(3), CplxElement::new(4)]
+                    },
+                    CplxElement::new(6),
+                ],
+            },
+            CplxElement::new(8)
+        ]
+    );
 }

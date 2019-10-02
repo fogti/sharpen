@@ -8,5 +8,5 @@ pub mod tree_rollup;
 
 pub use crate::{
     classify_::{classify, classify_as_vec, Classify},
-    tree_rollup::rollup_tree,
+    tree_rollup::{rollup_tree, rollup_tree_bottomup},
 };
