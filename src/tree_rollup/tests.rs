@@ -1,5 +1,5 @@
 use super::*;
-use alloc::vec;
+use alloc::{collections::BTreeMap, vec};
 
 #[derive(Debug, PartialEq, Eq)]
 struct Element(usize);
@@ -20,7 +20,7 @@ fn test_rollup_tree() {
     mapping.insert(3, 2);
     mapping.insert(4, 1);
 
-    let result: Vec<_> = rollup_tree(input.into_iter(), &mapping)
+    let result: Vec<_> = rollup_tree(input.into_iter(), mapping)
         .expect("valid mapping")
         .collect();
     assert_eq!(result, vec![Element(5), Element(5),]);
