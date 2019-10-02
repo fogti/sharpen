@@ -31,7 +31,7 @@ Return value:
 * Some(iter): The rolled-up tree, with only top-level children left at top-level.
 **/
 #[inline]
-pub fn rollup_tree<'m, T, I, M>(input: I, mapping: M) -> Option<impl Iterator<Item = T>>
+pub fn rollup_tree<T, I, M>(input: I, mapping: M) -> Option<impl Iterator<Item = T>>
 where
     T: Node,
     I: IntoIterator<Item = T>,
@@ -41,7 +41,7 @@ where
     rollup_tree_intern(input.into_iter().map(Some).collect(), mapping.into_iter())
 }
 
-fn rollup_tree_intern<'m, T, M>(
+fn rollup_tree_intern<T, M>(
     mut v: Vec<Option<T>>,
     mapping: M,
 ) -> Option<impl Iterator<Item = T>>
@@ -79,7 +79,7 @@ Return value:
 * Some(iter): The rolled-up tree, with only top-level children left at top-level.
 **/
 #[inline]
-pub fn rollup_tree_bottomup<'m, T, I, M>(input: I, mapping: M) -> Option<impl Iterator<Item = T>>
+pub fn rollup_tree_bottomup<T, I, M>(input: I, mapping: M) -> Option<impl Iterator<Item = T>>
 where
     T: Node,
     I: IntoIterator<Item = T>,
@@ -88,7 +88,7 @@ where
     rollup_tree_bottomup_intern(input.into_iter().map(Some).collect(), mapping.into_iter())
 }
 
-fn rollup_tree_bottomup_intern<'m, T, M>(
+fn rollup_tree_bottomup_intern<T, M>(
     mut v: Vec<Option<T>>,
     mapping: M,
 ) -> Option<impl Iterator<Item = T>>
