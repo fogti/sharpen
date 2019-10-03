@@ -7,12 +7,13 @@ pub trait Node {
     /// Add a child to a `parent=self`;
     ///
     /// NOTE if used with [`rollup_tree`]:
-    /// the children are pushed in reverse order and pushing is finished with a call to [`Node::reverse`]
+    /// the children are pushed in reverse order and pushing is finished with a call to [`reverse`](Node::reverse)
     fn push_child(&mut self, child: Self);
 
     /// Reverse the order of the children
     /// to match the input order
-    /// called indirectly from [`rollup_tree`] (but **not** from [`rollup_tree_bottomup`])
+    ///
+    /// Gets called indirectly from [`rollup_tree`] (but **not** from [`rollup_tree_bottomup`])
     fn reverse(&mut self);
 }
 
@@ -41,10 +42,7 @@ where
     rollup_tree_intern(input.into_iter().map(Some).collect(), mapping.into_iter())
 }
 
-fn rollup_tree_intern<T, M>(
-    mut v: Vec<Option<T>>,
-    mapping: M,
-) -> Option<impl Iterator<Item = T>>
+fn rollup_tree_intern<T, M>(mut v: Vec<Option<T>>, mapping: M) -> Option<impl Iterator<Item = T>>
 where
     T: Node,
     M: Iterator<Item = (usize, usize)> + core::iter::DoubleEndedIterator,
