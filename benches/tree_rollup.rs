@@ -11,6 +11,9 @@ impl tree_rollup::Node for Element {
     fn push_child(&mut self, child: Element) {
         self.0 += child.0;
     }
+}
+
+impl tree_rollup::ReversableNode for Element {
     fn reverse(&mut self) {}
 }
 
@@ -33,6 +36,9 @@ impl tree_rollup::Node for CplxElement {
     fn push_child(&mut self, child: Self) {
         self.children.push(child);
     }
+}
+
+impl tree_rollup::ReversableNode for CplxElement {
     fn reverse(&mut self) {
         self.children.reverse();
     }

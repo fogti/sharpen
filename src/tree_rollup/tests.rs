@@ -8,6 +8,9 @@ impl Node for Element {
     fn push_child(&mut self, child: Element) {
         self.0 += child.0;
     }
+}
+
+impl ReversableNode for Element {
     fn reverse(&mut self) {}
 }
 
@@ -45,6 +48,9 @@ impl Node for CplxElement {
     fn push_child(&mut self, child: Self) {
         self.children.push(child);
     }
+}
+
+impl ReversableNode for CplxElement {
     fn reverse(&mut self) {
         self.children.reverse();
     }
